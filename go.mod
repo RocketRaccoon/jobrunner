@@ -1,4 +1,4 @@
-module github.com/bamzi/jobrunner
+module github.com/RocketRaccoon/jobrunner
 
 go 1.13
 
