@@ -25,32 +25,38 @@ type Func func()
 
 func (r Func) Run() { r() }
 
-func Schedule(spec string, job cron.Job, jobName string, obj []byte) error {
-	sched, err := cron.ParseStandard(spec)
+func Schedule(spec string, job cron.Job, jobName string, obj []byte) (*Job, error) {
+	schedule, err := cron.ParseStandard(spec)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	MainCron.Schedule(sched, New(job, jobName, obj))
-	return nil
+	j := New(job, jobName, obj)
+	MainCron.Schedule(schedule, j)
+	return j, nil
 }
 
 // Run the given job at a fixed interval.
 // The interval provided is the time between the job ending and the job being run again.
 // The time that the job takes to run is not included in the interval.
-func Every(duration time.Duration, job cron.Job, jobName string, obj []byte) {
-
-	MainCron.Schedule(cron.Every(duration), New(job, jobName, obj))
+func Every(duration time.Duration, job cron.Job, jobName string, obj []byte) *Job {
+	j := New(job, jobName, obj)
+	MainCron.Schedule(cron.Every(duration), j)
+	return j
 }
 
 // Run the given job right now.
-func Now(job cron.Job, jobName string, obj []byte) {
+func Now(job cron.Job, jobName string, obj []byte) *Job {
+	j := New(job, jobName, obj)
 	go New(job, jobName, obj).Run()
+	return j
 }
 
 // Run the given job once, after the given delay.
-func In(duration time.Duration, job cron.Job, jobName string, obj []byte) {
+func In(duration time.Duration, job cron.Job, jobName string, obj []byte) *Job {
+	j := New(job, jobName, obj)
 	go func() {
 		time.Sleep(duration)
-		New(job, jobName, obj).Run()
+		j.Run()
 	}()
+	return j
 }
