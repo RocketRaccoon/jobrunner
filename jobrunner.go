@@ -14,7 +14,7 @@ import (
 
 type Job struct {
 	Name    string
-	outer   []byte
+	Outer   []byte
 	inner   cron.Job
 	status  uint32
 	Status  string
