@@ -13,14 +13,14 @@ import (
 )
 
 type Job struct {
-	Name    string
-	Outer   []byte
-	inner   cron.Job
-	status  uint32
-	Status  string
-	Latency string
-	running sync.Mutex
-	Spec    string
+	Name    string     `json:"name"`
+	Outer   []byte     `json:"outer"`
+	inner   cron.Job   `json:"inner"`
+	status  uint32     `json:"statusCode,omitempty"`
+	Status  string     `json:"status,omitempty"`
+	Latency string     `json:"latency,omitempty"`
+	running sync.Mutex `json:"running,omitempty"`
+	Spec    string     `json:"spec"`
 }
 
 const UNNAMED = "(unnamed)"
