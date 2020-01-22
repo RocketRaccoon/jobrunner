@@ -14,6 +14,7 @@ import (
 
 type Job struct {
 	Name    string
+	outer   []byte
 	inner   cron.Job
 	status  uint32
 	Status  string
@@ -23,7 +24,7 @@ type Job struct {
 
 const UNNAMED = "(unnamed)"
 
-func New(job cron.Job, jobName string) *Job {
+func New(job cron.Job, jobName string, obj []byte) *Job {
 	var name string
 	if len(jobName) > 0 {
 		name = jobName
@@ -36,6 +37,7 @@ func New(job cron.Job, jobName string) *Job {
 	return &Job{
 		Name:  name,
 		inner: job,
+		outer: obj,
 	}
 }
 
