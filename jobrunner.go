@@ -37,7 +37,7 @@ func New(job cron.Job, jobName string, obj []byte) *Job {
 	return &Job{
 		Name:  name,
 		inner: job,
-		outer: obj,
+		Outer: obj,
 	}
 }
 
