@@ -11,6 +11,8 @@
 package jobrunner
 
 import (
+	"log"
+	"strings"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -25,12 +27,34 @@ type Func func()
 
 func (r Func) Run() { r() }
 
+const (
+	every       = "@every "
+	emptyString = ""
+	now         = "now"
+	in          = "in "
+)
+
 func Schedule(spec string, job cron.Job, jobName string, obj []byte) (*Job, error) {
+	if strings.HasPrefix(spec, every) {
+		d, err := time.ParseDuration(strings.ReplaceAll(spec, every, emptyString))
+		if err != nil {
+			log.Panic(err)
+		}
+		return Every(d, job, jobName, obj), nil
+	} else if strings.HasPrefix(spec, now) {
+		return Now(job, jobName, obj), nil
+	} else if strings.HasPrefix(spec, in) {
+		d, err := time.ParseDuration(strings.ReplaceAll(spec, every, emptyString))
+		if err != nil {
+			log.Panic(err)
+		}
+		return In(d, job, jobName, obj), nil
+	}
 	schedule, err := cron.ParseStandard(spec)
 	if err != nil {
 		return nil, err
 	}
-	j := New(job, jobName, obj)
+	j := New(job, jobName, obj, spec)
 	MainCron.Schedule(schedule, j)
 	return j, nil
 }
@@ -39,21 +63,24 @@ func Schedule(spec string, job cron.Job, jobName string, obj []byte) (*Job, erro
 // The interval provided is the time between the job ending and the job being run again.
 // The time that the job takes to run is not included in the interval.
 func Every(duration time.Duration, job cron.Job, jobName string, obj []byte) *Job {
-	j := New(job, jobName, obj)
+	spec := every + duration.String()
+	j := New(job, jobName, obj, spec)
 	MainCron.Schedule(cron.Every(duration), j)
 	return j
 }
 
 // Run the given job right now.
 func Now(job cron.Job, jobName string, obj []byte) *Job {
-	j := New(job, jobName, obj)
-	go New(job, jobName, obj).Run()
+	spec := "now"
+	j := New(job, jobName, obj, spec)
+	go j.Run()
 	return j
 }
 
 // Run the given job once, after the given delay.
 func In(duration time.Duration, job cron.Job, jobName string, obj []byte) *Job {
-	j := New(job, jobName, obj)
+	spec := "in " + duration.String()
+	j := New(job, jobName, obj, spec)
 	go func() {
 		time.Sleep(duration)
 		j.Run()

@@ -20,11 +20,12 @@ type Job struct {
 	Status  string
 	Latency string
 	running sync.Mutex
+	Spec    string
 }
 
 const UNNAMED = "(unnamed)"
 
-func New(job cron.Job, jobName string, obj []byte) *Job {
+func New(job cron.Job, jobName string, obj []byte, spec string) *Job {
 	var name string
 	if len(jobName) > 0 {
 		name = jobName
@@ -38,6 +39,7 @@ func New(job cron.Job, jobName string, obj []byte) *Job {
 		Name:  name,
 		inner: job,
 		Outer: obj,
+		Spec:  spec,
 	}
 }
 
