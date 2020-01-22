@@ -9,14 +9,14 @@ It includes a live monitoring of current schedule and state of active jobs that 
 
 ## Install
 
-`go get github.com/bamzi/jobrunner`
+`go get github.com/RocketRaccoon/jobrunner`
 
 ### Setup
 
 ```go
 package main
 
-import "github.com/bamzi/jobrunner"
+import "github.com/RocketRaccoon/jobrunner"
 
 func main() {
     jobrunner.Start() // optional: jobrunner.Start(pool int, concurrent int) (10, 1)
